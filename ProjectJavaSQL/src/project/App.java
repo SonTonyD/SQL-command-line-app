@@ -30,7 +30,7 @@ public class App {
             		if (table.getTableName().equals(SQL.getTableName())) {
             			if (SQL.getColumns().get(0).equals("*")) {
                         	System.out.println("Print all columns of the table");
-                        	
+                        	table.displayTable();
                         }
             		}
             	}

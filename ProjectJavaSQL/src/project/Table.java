@@ -36,5 +36,16 @@ public class Table {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+	
+	public void displayTable() {
+		int i = 0;
+		for (ArrayList<String> columnName : table) {
+			for (String column : columnName) {
+				System.out.print(column);
+			}
+			System.out.println("");
+			i += 1;
+		}
+	}
 
 }
