@@ -26,14 +26,7 @@ public class App {
             }
             
             if (input.split("\\s+")[0].equalsIgnoreCase("SELECT")) {
-            	for (Table table : database) {
-            		if (table.getTableName().equals(SQL.getTableName())) {
-            			if (SQL.getColumns().get(0).equals("*")) {
-                        	System.out.println("Print all columns of the table");
-                        	table.displayTable();
-                        }
-            		}
-            	}
+            	manageSelectStatement(database, SQL);
             }
         }
         
@@ -120,6 +113,17 @@ public class App {
         }
 	    
 	    return new Statement(columns, types, tableName);
+	}
+	
+	private static void manageSelectStatement(List<Table> database, Statement SQL) {
+		for (Table table : database) {
+    		if (table.getTableName().equals(SQL.getTableName())) {
+    			if (SQL.getColumns().get(0).equals("*")) {
+                	System.out.println("Print all columns of the table");
+                	table.displayTable();
+                }
+    		}
+    	}
 	}
 	
 
