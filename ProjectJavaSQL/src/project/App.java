@@ -11,9 +11,32 @@ public class App {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
         System.out.println("Enter a SQL statement:");
-        String input = sc.nextLine();
         
-        Statement SQL = parseManager(input);
+        List<Table> database = new ArrayList<>();
+        
+        while (true) {
+        	String input = sc.nextLine();
+            
+            Statement SQL = parseManager(input);
+            
+            if (input.split("\\s+")[0].equalsIgnoreCase("CREATE")) {
+            	Table table = new Table(SQL);
+            	database.add(table);
+            	System.out.println("Table created");
+            }
+            
+            if (input.split("\\s+")[0].equalsIgnoreCase("SELECT")) {
+            	for (Table table : database) {
+            		if (table.getTableName().equals(SQL.getTableName())) {
+            			if (SQL.getColumns().get(0).equals("*")) {
+                        	System.out.println("Print all columns of the table");
+                        	
+                        }
+            		}
+            	}
+            }
+        }
+        
         
         /*
         System.out.println(SQL.getColumns().get(0));
@@ -98,5 +121,6 @@ public class App {
 	    
 	    return new Statement(columns, types, tableName);
 	}
+	
 
 }
