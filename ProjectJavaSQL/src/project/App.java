@@ -121,7 +121,11 @@ public class App {
     			if (SQL.getColumns().get(0).equals("*")) {
                 	System.out.println("Print all columns of the table");
                 	table.displayTable();
+                } else {
+                	System.out.println("Print specific columns of the table");
+                	table.displayTable(SQL.getColumns());
                 }
+    			
     		}
     	}
 	}

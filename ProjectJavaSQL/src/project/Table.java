@@ -1,5 +1,6 @@
 package project;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Table {
 	
@@ -39,11 +40,26 @@ public class Table {
 	
 	public void displayTable() {
 		int i = 0;
-		for (ArrayList<String> columnName : table) {
-			for (String column : columnName) {
-				System.out.print(column);
+		for (ArrayList<String> column : table) {
+			for (String columnElement : column) {
+				System.out.print(columnElement);
 			}
 			System.out.println("");
+			i += 1;
+		}
+	}
+	
+	public void displayTable(List<String> requestColumns) {
+		int i = 0;
+		for (ArrayList<String> column : table) {
+			for (String requestColumn : requestColumns) {
+				if (column.get(0).equals(requestColumn)) {
+					for (String columnElement : column) {
+						System.out.print(columnElement);
+					}
+					System.out.println("");
+				}
+			}
 			i += 1;
 		}
 	}
