@@ -46,6 +46,9 @@ public class App {
 		else if (tokens[0].equalsIgnoreCase("INSERT")) {
 			return parseInsertStatement(input);
 		}
+		else if (tokens[0].equalsIgnoreCase("UPDATE")) {
+			return parseUpdateStatement(input);
+		}
 		else {
 			return parseSelectStatement(input);
 		}
@@ -65,6 +68,10 @@ public class App {
         
         if (input.split("\\s+")[0].equalsIgnoreCase("INSERT")) {
         	manageInsertStatement(database, SQL);
+        }
+        
+        if (input.split("\\s+")[0].equalsIgnoreCase("UPDATE")) {
+        	manageUpdateStatement(database, SQL);
         }
 	}
 	
@@ -158,6 +165,38 @@ public class App {
         return new Statement(requestColumns, requestValues, requestTableName, requestColumnSize);
 	}
 	
+	private static Statement parseUpdateStatement(String input) {
+		String regex = "UPDATE (\\w+) SET ([\\w\\s=,]+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        
+        List<String> requestColumns = new ArrayList<>();
+        List<String> requestValues = new ArrayList<>();
+        String requestTableName = "";
+        int numberOfUpdate = 0;
+        
+        if (matcher.find()) {
+            String tableName = matcher.group(1);
+            String[] updates = matcher.group(2).split(", ");
+
+            requestTableName = tableName;
+            numberOfUpdate = updates.length;
+            
+            for (String update : updates) {
+                String[] parts = update.split(" = ");
+                String columnName = parts[0];
+                String value = parts[1];
+                requestColumns.add(columnName);
+                requestValues.add(value);
+            }
+        } else {
+        	throw new RuntimeException("Invalid update input");
+        }
+		
+		return new Statement(requestColumns, requestValues, requestTableName, numberOfUpdate);
+		
+	}
+	
 	private static void manageSelectStatement(List<Table> database, Statement SQL) {
 		for (Table table : database) {
     		if (table.getTableName().equals(SQL.getTableName())) {
@@ -189,6 +228,30 @@ public class App {
 						}
 					}
 				}
+    		}
+		}
+	}
+	
+	private static void manageUpdateStatement (List<Table> database, Statement SQL) {
+		for (Table table : database) {
+			if (table.getTableName().equals(SQL.getTableName())) {
+    			
+				for (int i = 0; i < SQL.getColumns().size(); i++) {
+					for (int j = 0; j < table.getTable().size(); j++) {
+						String tableColumnName = table.getTable().get(j).get(0);
+						String requestColumnName = SQL.getColumns().get(i);
+						String requestValue = SQL.getValues().get(i);
+						
+						if (tableColumnName.equals(requestColumnName)) {
+							//Where condition here
+							for (int k = 1; k < table.getTable().get(j).size(); k++) {
+								table.getTable().get(j).set(k, requestValue);
+								System.out.println("element updated");
+							}			
+						}
+					}
+				}
+				
     		}
 		}
 	}
