@@ -19,26 +19,21 @@ public class App {
             
             Statement SQL = parseManager(input);
             
-            if (input.split("\\s+")[0].equalsIgnoreCase("CREATE")) {
-            	Table table = new Table(SQL);
-            	database.add(table);
-            	System.out.println("Table created");
-            }
+            requestHandler(input, SQL, database);
             
-            if (input.split("\\s+")[0].equalsIgnoreCase("SELECT")) {
-            	manageSelectStatement(database, SQL);
-            }
         }
-        
-        
-        /*
-        System.out.println(SQL.getColumns().get(0));
-        System.out.println(SQL.getColumns().get(1));
-        System.out.println(SQL.getColumns().get(2));
-        System.out.println(SQL.getTable());
-        */
-        
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private static Statement parseManager(String input) {
 		String[] tokens = input.split("\\s+");
@@ -48,10 +43,29 @@ public class App {
 		else if (tokens[0].equalsIgnoreCase("CREATE")) {
 			return parseCreateTableStatement(input);
 		}
+		else if (tokens[0].equalsIgnoreCase("INSERT")) {
+			return parseInsertStatement(input);
+		}
 		else {
 			return parseSelectStatement(input);
 		}
 		
+	}
+	
+	private static void requestHandler(String input, Statement SQL, List<Table> database) {
+		if (input.split("\\s+")[0].equalsIgnoreCase("CREATE")) {
+        	Table table = new Table(SQL);
+        	database.add(table);
+        	System.out.println("Table created");
+        }
+        
+        if (input.split("\\s+")[0].equalsIgnoreCase("SELECT")) {
+        	manageSelectStatement(database, SQL);
+        }
+        
+        if (input.split("\\s+")[0].equalsIgnoreCase("INSERT")) {
+        	manageInsertStatement(database, SQL);
+        }
 	}
 	
 	private static Statement parseSelectStatement(String input) {
@@ -109,10 +123,39 @@ public class App {
                 types.add(dataType);
             }
         } else {
-            throw new RuntimeException("Invalid input");
+            throw new RuntimeException("Invalid create table input");
         }
 	    
 	    return new Statement(columns, types, tableName);
+	}
+	
+	private static Statement parseInsertStatement(String input) {
+		String regex = "INSERT INTO (\\w+) \\(([\\w\\s,]+)\\) VALUES \\(([\\w\\s,]+)\\);";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        
+        List<String> requestColumns = new ArrayList<>();
+        List<String> requestValues = new ArrayList<>();
+        String requestTableName = "";
+        int requestColumnSize = 0;
+        
+        if (matcher.find()) {
+            String tableName = matcher.group(1);
+            String[] columns = matcher.group(2).split(", ");
+            String[] values = matcher.group(3).split(", ");
+
+            requestTableName = tableName;
+            requestColumnSize = columns.length;
+            
+            for (int i = 0; i < columns.length; i++) {
+                requestColumns.add(columns[i]);
+                requestValues.add(values[i]);
+                
+            }
+        } else {
+        	throw new RuntimeException("Invalid insert input");
+        }
+        return new Statement(requestColumns, requestValues, requestTableName, requestColumnSize);
 	}
 	
 	private static void manageSelectStatement(List<Table> database, Statement SQL) {
@@ -128,6 +171,26 @@ public class App {
     			
     		}
     	}
+	}
+	
+	private static void manageInsertStatement(List<Table> database, Statement SQL) {
+		for (Table table : database) {
+			if (table.getTableName().equals(SQL.getTableName())) {
+    			
+				for (int i = 0; i < SQL.getColumns().size(); i++) {
+					for (int j = 0; j < table.getTable().size(); j++) {
+						String tableColumnName = table.getTable().get(j).get(0);
+						String requestColumnName = SQL.getColumns().get(i);
+						String requestValue = SQL.getValues().get(i);
+						
+						if (tableColumnName.equals(requestColumnName)) {
+							table.getTable().get(j).add(requestValue);
+							System.out.println("element inserted");
+						}
+					}
+				}
+    		}
+		}
 	}
 	
 

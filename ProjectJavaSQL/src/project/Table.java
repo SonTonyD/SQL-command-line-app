@@ -43,6 +43,7 @@ public class Table {
 		for (ArrayList<String> column : table) {
 			for (String columnElement : column) {
 				System.out.print(columnElement);
+				System.out.print(" ");
 			}
 			System.out.println("");
 			i += 1;

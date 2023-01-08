@@ -6,6 +6,7 @@ public class Statement {
 
 	private  List<String> columns;
 	private  List<String> types;
+	private  List<String> values;
 	private  String tableName;
 	
 	public Statement(List<String> columns, String tableName) {
@@ -16,6 +17,12 @@ public class Statement {
 	public Statement(List<String> columns, List<String> types, String tableName) {
 		this.columns = columns;
 		this.types = types;
+		this.tableName = tableName;
+	}
+	
+	public Statement(List<String> columns, List<String> values, String tableName, int numberOfColumn) {
+		this.columns = columns;
+		this.values = values;
 		this.tableName = tableName;
 	}
 	
@@ -40,6 +47,14 @@ public class Statement {
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+
+	public List<String> getValues() {
+		return values;
+	}
+
+	public void setValues(List<String> values) {
+		this.values = values;
 	}
 	
 
