@@ -14,14 +14,45 @@ public class App {
         
         List<Table> database = new ArrayList<>();
         
+        //Test
+        /*
+        String command = "CREATE TABLE t (name string, surname string);";
+        Statement SQL = parseManager(command);
+        requestHandler(command, SQL, database);
+        
+        command = "INSERT INTO t (name, surname) VALUES (sontony, dinh);";
+        SQL = parseManager(command);
+        requestHandler(command, SQL, database);
+        
+        command = "INSERT INTO t (name, surname) VALUES (remi, derville);";
+        SQL = parseManager(command);
+        requestHandler(command, SQL, database);
+        
         while (true) {
         	String input = sc.nextLine();
             
-            Statement SQL = parseManager(input);
-            
-            requestHandler(input, SQL, database);
-            
+        	try {
+        		SQL = parseManager(input);
+                requestHandler(input, SQL, database);
+        	} catch (Exception e) {
+        		System.out.println("Wrong input");
+        	}
         }
+        */
+        //Test
+        
+        //Uncomment this section for real case
+        while (true) {
+        	String input = sc.nextLine();
+            
+        	try {
+        		Statement SQL = parseManager(input);
+                requestHandler(input, SQL, database);
+        	} catch (Exception e) {
+        		System.out.println("Wrong input");
+        	}  
+        }
+        //Uncomment this section for real case
 	}
 	
 	
@@ -49,6 +80,9 @@ public class App {
 		else if (tokens[0].equalsIgnoreCase("UPDATE")) {
 			return parseUpdateStatement(input);
 		}
+		else if (tokens[0].equalsIgnoreCase("DELETE")) {
+			return parseDeleteStatement(input);
+		}
 		else {
 			return parseSelectStatement(input);
 		}
@@ -72,6 +106,10 @@ public class App {
         
         if (input.split("\\s+")[0].equalsIgnoreCase("UPDATE")) {
         	manageUpdateStatement(database, SQL);
+        }
+        
+        if (input.split("\\s+")[0].equalsIgnoreCase("DELETE")) {
+        	manageDeleteStatement(database, SQL);
         }
 	}
 	
@@ -197,6 +235,23 @@ public class App {
 		
 	}
 	
+	private static Statement parseDeleteStatement (String input) {
+		String regex = "DELETE FROM (\\w+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        
+        String requestTableName = "";
+
+        if (matcher.find()) {
+            String tableName = matcher.group(1);
+            requestTableName = tableName;
+        } else {
+        	throw new RuntimeException("Invalid delete input");
+        }
+        
+        return new Statement(requestTableName);
+	}
+	
 	private static void manageSelectStatement(List<Table> database, Statement SQL) {
 		for (Table table : database) {
     		if (table.getTableName().equals(SQL.getTableName())) {
@@ -252,6 +307,21 @@ public class App {
 					}
 				}
 				
+    		}
+		}
+	}
+	
+	private static void manageDeleteStatement (List<Table> database, Statement SQL) {
+		for (Table table : database) {
+			if (table.getTableName().equals(SQL.getTableName())) {
+    			
+				for (int i = 0; i < table.getTable().size(); i++) {
+					//Where condition here
+					for (int k = table.getTable().get(i).size()-1; k >= 1; k--) {
+						table.getTable().get(i).remove(k);
+						System.out.println("element deleted");
+					}			
+				}
     		}
 		}
 	}

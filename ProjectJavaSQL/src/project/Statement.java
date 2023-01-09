@@ -9,6 +9,10 @@ public class Statement {
 	private  List<String> values;
 	private  String tableName;
 	
+	public Statement(String tableName) {
+		this.tableName = tableName;
+	}
+	
 	public Statement(List<String> columns, String tableName) {
 		this.columns = columns;
 		this.tableName = tableName;
