@@ -297,7 +297,8 @@ public class App {
     				String whereColumn = SQL.getWhereColumn();
     				String whereComparator = SQL.getWhereComparator();
     				String whereValue = SQL.getWhereValue();
-    				table.whereRequest(whereColumn, whereValue, whereComparator);
+    				
+    				table.whereRequest(whereColumn, whereValue, whereComparator, SQL.getColumns());
     			}
     			
     			
