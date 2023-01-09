@@ -15,6 +15,7 @@ public class App {
         List<Table> database = new ArrayList<>();
         
         //Uncomment this section for real case
+        /*
         while (true) {
         	String input = sc.nextLine();
             
@@ -25,10 +26,11 @@ public class App {
         		e.printStackTrace();
         	}  
         }
+        */
         //Uncomment this section for real case
         
         //Test
-        /*
+        
         String command = "CREATE TABLE t (name string, surname string);";
         Statement SQL = parseManager(command);
         requestHandler(command, SQL, database);
@@ -41,6 +43,7 @@ public class App {
         SQL = parseManager(command);
         requestHandler(command, SQL, database);
         
+        
         while (true) {
         	String input = sc.nextLine();
             
@@ -51,7 +54,7 @@ public class App {
         		System.out.println("Wrong input");
         	}
         }
-        */
+        
         //Test
 	}
 	
@@ -85,6 +88,8 @@ public class App {
 		else if (tokens[0].equalsIgnoreCase("DELETE")) {
 			parseDeleteStatement(input, builder);
 		}
+		
+		parseWhereCondition(input, builder); 
 		
 		return builder.getResult();
 	}
@@ -259,16 +264,42 @@ public class App {
 
 	}
 	
+	private static void parseWhereCondition(String input, StatementBuilder builder) {
+		String regex = "WHERE (\\w+) (\\S+) (\\w+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            String column = matcher.group(1);
+            String comparator = matcher.group(2);
+            String value = matcher.group(3);
+            
+            builder.setWhereColumn(column);
+            builder.setWhereComparator(comparator);
+            builder.setWhereValue(value);
+        }
+        
+	}
+	
 	private static void manageSelectStatement(List<Table> database, Statement SQL) {
 		for (Table table : database) {
     		if (table.getTableName().equals(SQL.getTableName())) {
-    			if (SQL.getColumns().get(0).equals("*")) {
-                	System.out.println("Print all columns of the table");
-                	table.displayTable();
-                } else {
-                	System.out.println("Print specific columns of the table");
-                	table.displayTable(SQL.getColumns());
-                }
+    			
+    			if (SQL.getWhereColumn().equals("")) {
+    				if (SQL.getColumns().get(0).equals("*")) {
+                    	System.out.println("Print all columns of the table");
+                    	table.displayTable();
+                    } else {
+                    	System.out.println("Print specific columns of the table");
+                    	table.displayTable(SQL.getColumns());
+                    }
+    			} else {
+    				String whereColumn = SQL.getWhereColumn();
+    				String whereComparator = SQL.getWhereComparator();
+    				String whereValue = SQL.getWhereValue();
+    				table.whereRequest(whereColumn, whereValue, whereComparator);
+    			}
+    			
     			
     		}
     	}

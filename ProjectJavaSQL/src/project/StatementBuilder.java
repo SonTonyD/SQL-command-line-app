@@ -8,6 +8,9 @@ public class StatementBuilder {
 	private  List<String> types;
 	private  List<String> values;
 	private  String tableName;
+	private  String whereColumn;
+	private  String whereValue;
+	private  String whereComparator;
 	
 	
 	public StatementBuilder() {
@@ -19,6 +22,9 @@ public class StatementBuilder {
 		this.types = new ArrayList<String>();
 		this.values = new ArrayList<String>();
 		this.tableName = "";
+		this.whereColumn = "";
+		this.whereValue = "";
+		this.whereComparator = "";
 	}
 
 	public void setColumns(List<String> columns) {
@@ -40,9 +46,25 @@ public class StatementBuilder {
 		this.tableName = tableName;
 	}
 	
-	public Statement getResult() {
-		return new Statement(this.columns, this.types, this.values, this.tableName);
+	public void setWhereColumn(String whereColumn) {
+		this.whereColumn = whereColumn;
 	}
+	
+	public void setWhereValue(String whereValue) {
+		this.whereValue = whereValue;
+	}
+	
+	public void setWhereComparator(String whereComparator) {
+		this.whereComparator = whereComparator;
+	}
+	
+	public Statement getResult() {
+		return new Statement(this.columns, this.types, this.values, this.tableName, this.whereColumn, this.whereValue, this.whereComparator);
+	}
+
+	
+
+	
 	
 	
 }

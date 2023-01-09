@@ -64,5 +64,32 @@ public class Table {
 			i += 1;
 		}
 	}
+	
+	private void displayRow(int id) {
+		for (int j = 0; j < this.table.size(); j++) {
+			String elem = this.table.get(j).get(id);
+			System.out.println(elem);
+		}
+	}
+	
+	public void whereRequest(String whereColumn, String whereValue, String whereComparator) {
+		for (int i = 0; i < this.table.get(0).size(); i++) {
+			for (int j = 0; j < this.table.size(); j++) {
+				String elem = this.table.get(j).get(i);
+				String tableColumnName = this.table.get(j).get(0);
+				if (tableColumnName.equals(whereColumn) && elem.compareTo(whereValue) == 0 && whereComparator.equals("=")) {
+					displayRow(i);
+				}
+				
+				if (tableColumnName.equals(whereColumn) && elem.compareTo(whereValue) < 0 && whereComparator.equals("<")) {
+					displayRow(i);
+				}
+				
+				if (tableColumnName.equals(whereColumn) && elem.compareTo(whereValue) > 0 && whereComparator.equals(">")) {
+					displayRow(i);
+				}
+			}
+		}
+	}
 
 }
