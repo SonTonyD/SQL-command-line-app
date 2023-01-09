@@ -14,6 +14,19 @@ public class App {
         
         List<Table> database = new ArrayList<>();
         
+        //Uncomment this section for real case
+        while (true) {
+        	String input = sc.nextLine();
+            
+        	try {
+        		Statement SQL = parseManager(input);
+                requestHandler(input, SQL, database);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}  
+        }
+        //Uncomment this section for real case
+        
         //Test
         /*
         String command = "CREATE TABLE t (name string, surname string);";
@@ -40,19 +53,6 @@ public class App {
         }
         */
         //Test
-        
-        //Uncomment this section for real case
-        while (true) {
-        	String input = sc.nextLine();
-            
-        	try {
-        		Statement SQL = parseManager(input);
-                requestHandler(input, SQL, database);
-        	} catch (Exception e) {
-        		System.out.println("Wrong input");
-        	}  
-        }
-        //Uncomment this section for real case
 	}
 	
 	
@@ -67,26 +67,26 @@ public class App {
 	
 	
 	private static Statement parseManager(String input) {
+		StatementBuilder builder = new StatementBuilder();
+		
 		String[] tokens = input.split("\\s+");
 		if (tokens[0].equalsIgnoreCase("SELECT")) {
-			return parseSelectStatement(input);
+			parseSelectStatement(input, builder);
 		}
 		else if (tokens[0].equalsIgnoreCase("CREATE")) {
-			return parseCreateTableStatement(input);
+			parseCreateTableStatement(input, builder);
 		}
 		else if (tokens[0].equalsIgnoreCase("INSERT")) {
-			return parseInsertStatement(input);
+			parseInsertStatement(input, builder);
 		}
 		else if (tokens[0].equalsIgnoreCase("UPDATE")) {
-			return parseUpdateStatement(input);
+			parseUpdateStatement(input, builder);
 		}
 		else if (tokens[0].equalsIgnoreCase("DELETE")) {
-			return parseDeleteStatement(input);
-		}
-		else {
-			return parseSelectStatement(input);
+			parseDeleteStatement(input, builder);
 		}
 		
+		return builder.getResult();
 	}
 	
 	private static void requestHandler(String input, Statement SQL, List<Table> database) {
@@ -113,9 +113,8 @@ public class App {
         }
 	}
 	
-	private static Statement parseSelectStatement(String input) {
+	private static void parseSelectStatement(String input, StatementBuilder builder) {
 		String newInput = input.replaceAll(",", " ");
-		
 		String[] tokens = newInput.split("\\s+");
 		
 	    
@@ -140,10 +139,12 @@ public class App {
 	    // Parse the table name
 	    String tableName = tokens[i + 1];   
 	    
-	    return new Statement(columns, tableName);
+	    builder.setTableName(tableName);
+	    builder.setColumns(columns);
+	    
 	}
 	
-	private static Statement parseCreateTableStatement(String input) {
+	private static void parseCreateTableStatement(String input, StatementBuilder builder) {
 		String regex = "CREATE TABLE (\\w+) \\(([\\w\\s,]+)\\);";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -170,11 +171,14 @@ public class App {
         } else {
             throw new RuntimeException("Invalid create table input");
         }
+        
+        builder.setTableName(tableName);
+	    builder.setColumns(columns);
+	    builder.setTypes(types);
 	    
-	    return new Statement(columns, types, tableName);
 	}
 	
-	private static Statement parseInsertStatement(String input) {
+	private static void parseInsertStatement(String input, StatementBuilder builder) {
 		String regex = "INSERT INTO (\\w+) \\(([\\w\\s,]+)\\) VALUES \\(([\\w\\s,]+)\\);";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -182,7 +186,6 @@ public class App {
         List<String> requestColumns = new ArrayList<>();
         List<String> requestValues = new ArrayList<>();
         String requestTableName = "";
-        int requestColumnSize = 0;
         
         if (matcher.find()) {
             String tableName = matcher.group(1);
@@ -190,7 +193,6 @@ public class App {
             String[] values = matcher.group(3).split(", ");
 
             requestTableName = tableName;
-            requestColumnSize = columns.length;
             
             for (int i = 0; i < columns.length; i++) {
                 requestColumns.add(columns[i]);
@@ -200,10 +202,14 @@ public class App {
         } else {
         	throw new RuntimeException("Invalid insert input");
         }
-        return new Statement(requestColumns, requestValues, requestTableName, requestColumnSize);
+        
+        builder.setTableName(requestTableName);
+	    builder.setColumns(requestColumns);
+	    builder.setValues(requestValues);
+        
 	}
 	
-	private static Statement parseUpdateStatement(String input) {
+	private static void parseUpdateStatement(String input, StatementBuilder builder) {
 		String regex = "UPDATE (\\w+) SET ([\\w\\s=,]+)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -211,14 +217,12 @@ public class App {
         List<String> requestColumns = new ArrayList<>();
         List<String> requestValues = new ArrayList<>();
         String requestTableName = "";
-        int numberOfUpdate = 0;
         
         if (matcher.find()) {
             String tableName = matcher.group(1);
             String[] updates = matcher.group(2).split(", ");
 
             requestTableName = tableName;
-            numberOfUpdate = updates.length;
             
             for (String update : updates) {
                 String[] parts = update.split(" = ");
@@ -230,12 +234,14 @@ public class App {
         } else {
         	throw new RuntimeException("Invalid update input");
         }
-		
-		return new Statement(requestColumns, requestValues, requestTableName, numberOfUpdate);
+        
+        builder.setTableName(requestTableName);
+	    builder.setColumns(requestColumns);
+	    builder.setValues(requestValues);
 		
 	}
 	
-	private static Statement parseDeleteStatement (String input) {
+	private static void parseDeleteStatement (String input, StatementBuilder builder) {
 		String regex = "DELETE FROM (\\w+)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -249,7 +255,8 @@ public class App {
         	throw new RuntimeException("Invalid delete input");
         }
         
-        return new Statement(requestTableName);
+        builder.setTableName(requestTableName);
+
 	}
 	
 	private static void manageSelectStatement(List<Table> database, Statement SQL) {

@@ -9,23 +9,9 @@ public class Statement {
 	private  List<String> values;
 	private  String tableName;
 	
-	public Statement(String tableName) {
-		this.tableName = tableName;
-	}
-	
-	public Statement(List<String> columns, String tableName) {
-		this.columns = columns;
-		this.tableName = tableName;
-	}
-	
-	public Statement(List<String> columns, List<String> types, String tableName) {
+	public Statement(List<String> columns, List<String> types, List<String> values, String tableName) {
 		this.columns = columns;
 		this.types = types;
-		this.tableName = tableName;
-	}
-	
-	public Statement(List<String> columns, List<String> values, String tableName, int numberOfColumn) {
-		this.columns = columns;
 		this.values = values;
 		this.tableName = tableName;
 	}
