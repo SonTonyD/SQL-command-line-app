@@ -31,15 +31,15 @@ public class App {
         
         //Test
         
-        String command = "CREATE TABLE t (name string, surname string);";
+        String command = "CREATE TABLE t (name string, surname string, age int);";
         Statement SQL = parseManager(command);
         requestHandler(command, SQL, database);
         
-        command = "INSERT INTO t (name, surname) VALUES (sontony, dinh);";
+        command = "INSERT INTO t (name, surname, age) VALUES (sontony, dinh, 21);";
         SQL = parseManager(command);
         requestHandler(command, SQL, database);
         
-        command = "INSERT INTO t (name, surname) VALUES (remi, derville);";
+        command = "INSERT INTO t (name, surname, age) VALUES (remi, derville, 22);";
         SQL = parseManager(command);
         requestHandler(command, SQL, database);
         
